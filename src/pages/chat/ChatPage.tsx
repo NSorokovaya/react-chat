@@ -9,9 +9,8 @@ export const ChatPage = () => {
   return (
     <div className="h-screen flex flex-col">
       <Header />
-
-      <div className="flex-grow flex justify-center items-center">
-        {chatId ? <ChatWindow chatId={chatId} /> : null}
+      <div className="flex-grow flex justify-center items-center bg-gray-100">
+        {chatId ? <ChatWindow chatId={chatId} /> : <div>Select a chat</div>}
       </div>
     </div>
   );

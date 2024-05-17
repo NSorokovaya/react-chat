@@ -28,8 +28,9 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
 
   return (
     <input
-      className="p-1 border-b-2 border-black focus:outline-none"
+      className="w-full p-2 border rounded-full focus:outline-none focus:ring focus:border-blue-300"
       type="text"
+      placeholder="Type a message..."
       value={message}
       onChange={(e) => setMessage(e.target.value)}
       onKeyDown={onKeyDown}
