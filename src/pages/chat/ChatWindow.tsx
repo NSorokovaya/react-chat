@@ -18,6 +18,7 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
               className="flex items-start p-2 rounded-lg bg-gray-100"
             >
               <div className="flex-shrink-0 mr-3">
+                {/* Кружочек вместо аватара */}
                 <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
               </div>
               <div>

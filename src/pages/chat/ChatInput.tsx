@@ -1,5 +1,4 @@
 import { KeyboardEvent, useState } from "react";
-
 import { createTextMessage } from "../../api/messages-api";
 import { auth } from "../../firebase";
 
@@ -10,31 +9,40 @@ interface ChatInputProps {
 const ChatInput = ({ chatId }: ChatInputProps) => {
   const [message, setMessage] = useState("");
 
-  const onKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
-    if (!auth.currentUser) {
-      return;
-    }
-
-    if (e.key === "Enter") {
-      setMessage("");
-
+  const sendMessage = async () => {
+    if (auth.currentUser && message.trim() !== "") {
       await createTextMessage({
         chatId,
         text: message,
         creator: auth.currentUser.uid,
       });
+      setMessage("");
+    }
+  };
+
+  const onKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      await sendMessage();
     }
   };
 
   return (
-    <input
-      className="w-full p-2 border rounded-full focus:outline-none focus:ring focus:border-blue-300"
-      type="text"
-      placeholder="Type a message..."
-      value={message}
-      onChange={(e) => setMessage(e.target.value)}
-      onKeyDown={onKeyDown}
-    />
+    <div className="flex items-center space-x-2">
+      <input
+        className="flex-grow p-2 border rounded-full focus:outline-none focus:ring focus:border-blue-300"
+        type="text"
+        placeholder="Type a message..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={onKeyDown}
+      />
+      <button
+        className="p-2 bg-blue-500 text-white rounded-full focus:outline-none hover:bg-blue-600"
+        onClick={sendMessage}
+      >
+        Send
+      </button>
+    </div>
   );
 };
 
