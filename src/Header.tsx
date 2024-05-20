@@ -1,17 +1,26 @@
-import { useEffect, useState } from "react";
-import { User, signInWithPopup } from "firebase/auth";
-
-import { auth, provider } from "./firebase";
 import { createChat } from "./api/chats-api";
+import { useDispatch, useSelector } from "react-redux";
+import { login, logout } from "./redux/actions";
+import { RootState } from "@reduxjs/toolkit/query";
+import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { useEffect } from "react";
+import { auth, provider } from "./firebase";
 
 const Header = () => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state: RootState) => state.auth.currentUser);
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      setCurrentUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        dispatch(login(user));
+      } else {
+        dispatch(logout());
+      }
     });
-  }, []);
+
+    return () => unsubscribe();
+  }, [dispatch]);
 
   const onCreateChatClick = async () => {
     if (currentUser && currentUser.uid) {
@@ -21,11 +30,24 @@ const Header = () => {
   };
 
   const onSignInClick = () => {
-    signInWithPopup(auth, provider);
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        dispatch(login(user));
+      })
+      .catch((error) => {
+        console.error("Error signing in:", error);
+      });
   };
 
   const onSignOutClick = () => {
-    auth.signOut();
+    signOut(auth)
+      .then(() => {
+        dispatch(logout());
+      })
+      .catch((error) => {
+        console.error("Error signing out:", error);
+      });
   };
 
   return (
