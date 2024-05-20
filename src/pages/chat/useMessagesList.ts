@@ -21,7 +21,7 @@ export const useMessagesList = (chatId: string) => {
     const q = query(
       collection(db, `chats/${chatId}/messages`),
       orderBy("createdAt", "desc"),
-      limit(5)
+      limit(30)
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
