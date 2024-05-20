@@ -1,7 +1,12 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { login, logout } from "./actions";
+import { login, logout, setCurrentUser } from "./actions";
+import { User } from "firebase/auth";
 
-const initialState = {
+interface AuthState {
+  currentUser: User | null | undefined;
+}
+
+const initialState: AuthState = {
   currentUser: null,
 };
 
@@ -12,6 +17,9 @@ const authReducer = createReducer(initialState, (builder) => {
     })
     .addCase(logout, (state) => {
       state.currentUser = null;
+    })
+    .addCase(setCurrentUser, (state, action) => {
+      state.currentUser = action.payload;
     });
 });
 

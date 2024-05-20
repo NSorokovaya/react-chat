@@ -1,26 +1,12 @@
-import { createChat } from "./api/chats-api";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "./redux/actions";
-import { RootState } from "@reduxjs/toolkit/query";
-import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
-import { useEffect } from "react";
-import { auth, provider } from "./firebase";
+
+import { createChat } from "./api/chats-api";
+import { RootState } from "./redux/reducers";
 
 const Header = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state: RootState) => state.auth.currentUser);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        dispatch(login(user));
-      } else {
-        dispatch(logout());
-      }
-    });
-
-    return () => unsubscribe();
-  }, [dispatch]);
 
   const onCreateChatClick = async () => {
     if (currentUser && currentUser.uid) {
@@ -30,44 +16,30 @@ const Header = () => {
   };
 
   const onSignInClick = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        dispatch(login(user));
-      })
-      .catch((error) => {
-        console.error("Error signing in:", error);
-      });
+    dispatch(login());
   };
 
   const onSignOutClick = () => {
-    signOut(auth)
-      .then(() => {
-        dispatch(logout());
-      })
-      .catch((error) => {
-        console.error("Error signing out:", error);
-      });
+    dispatch(logout());
   };
 
   return (
     <header className="px-5 flex gap-5 justify-end">
       {currentUser ? (
-        <button
-          className="cursor-pointer hover:underline"
-          onClick={onCreateChatClick}
-        >
-          Create Chat
-        </button>
-      ) : null}
-
-      {currentUser ? (
-        <button
-          className="cursor-pointer hover:underline"
-          onClick={onSignOutClick}
-        >
-          {currentUser.displayName}
-        </button>
+        <>
+          <button
+            className="cursor-pointer hover:underline"
+            onClick={onCreateChatClick}
+          >
+            Create Chat
+          </button>
+          <button
+            className="cursor-pointer hover:underline"
+            onClick={onSignOutClick}
+          >
+            {currentUser.displayName}
+          </button>
+        </>
       ) : (
         <button
           className="cursor-pointer hover:underline"
