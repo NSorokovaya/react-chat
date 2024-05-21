@@ -2,6 +2,7 @@ import { useMessagesList } from "./useMessagesList";
 import ChatInput from "./ChatInput";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { useEffect, useRef } from "react";
 
 interface ChatWindowProps {
   chatId: string;
@@ -9,13 +10,24 @@ interface ChatWindowProps {
 
 const ChatWindow = ({ chatId }: ChatWindowProps) => {
   const { messagesList } = useMessagesList(chatId);
+
+  const messagesScrollRef = useRef<HTMLLIElement | null>(null);
+
   const currentUser = useSelector((state: RootState) => state.auth.currentUser);
+
+  useEffect(() => {
+    if (messagesScrollRef.current) {
+      messagesScrollRef.current?.lastElementChild?.scrollIntoView();
+    }
+  }, [messagesList]);
+
   return (
     <div className="flex flex-col h-[900px] w-[600px] border-2 border-gray-300 rounded-lg shadow-lg">
       <div className="flex-grow overflow-y-auto p-4 bg-white">
         <ul className="space-y-2">
           {messagesList.map((message) => (
             <li
+              ref={messagesScrollRef}
               key={message.id}
               className={`flex  ${
                 message.creator === currentUser?.uid
