@@ -10,7 +10,6 @@ interface ChatWindowProps {
 
 const ChatWindow = ({ chatId }: ChatWindowProps) => {
   const { messagesList } = useMessagesList(chatId);
-
   const messagesScrollRef = useRef<HTMLLIElement | null>(null);
 
   const currentUser = useSelector((state: RootState) => state.auth.currentUser);
@@ -19,6 +18,10 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
     messagesScrollRef.current?.lastElementChild?.scrollIntoView();
   }, [messagesList]);
 
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp.seconds * 1000);
+    return date;
+  };
   return (
     <div className="flex flex-col h-[900px] w-[600px] border-2 border-gray-300 rounded-lg shadow-lg">
       <div className="flex-grow overflow-y-auto p-4 bg-white">
@@ -27,23 +30,28 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
             <li
               ref={messagesScrollRef}
               key={message.id}
-              className={`flex  ${
+              className={`flex ${
                 message.creator === currentUser?.uid
                   ? "justify-end"
                   : "justify-start "
               }`}
             >
-              <div className="flex items-center bg-gray-100 rounded-lg p-4">
-                <div className=" mr-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
-                </div>
-                <div>
-                  <p>
-                    {message.creator === currentUser?.uid
-                      ? currentUser.displayName
-                      : "Other Users"}
-                  </p>
-                  <div className="text-gray-900">{message.text}</div>
+              <div className=" mb-4 ">
+                <p className="text-gray-400 text-end">
+                  {formatDate(message.createdAt).toLocaleString()}
+                </p>
+                <div className="flex items-center bg-gray-100 rounded-lg p-4">
+                  <div className=" mr-3">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">
+                      {message.creator === currentUser?.uid
+                        ? currentUser.displayName
+                        : "Other Users"}
+                    </p>
+                    <div className="text-black">{message.text}</div>
+                  </div>
                 </div>
               </div>
             </li>

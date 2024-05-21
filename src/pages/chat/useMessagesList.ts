@@ -29,6 +29,7 @@ export const useMessagesList = (chatId: string) => {
         id: doc.id,
         text: doc.data().text,
         creator: doc.data().creator,
+        createdAt: doc.data().createdAt,
       }));
 
       setMessagesList(messagesData.reverse());
