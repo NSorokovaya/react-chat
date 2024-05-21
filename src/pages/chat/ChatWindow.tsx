@@ -16,9 +16,7 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
   const currentUser = useSelector((state: RootState) => state.auth.currentUser);
 
   useEffect(() => {
-    if (messagesScrollRef.current) {
-      messagesScrollRef.current?.lastElementChild?.scrollIntoView();
-    }
+    messagesScrollRef.current?.lastElementChild?.scrollIntoView();
   }, [messagesList]);
 
   return (
