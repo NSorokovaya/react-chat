@@ -1,7 +1,7 @@
 import { call, put, takeLatest, take } from "redux-saga/effects";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { auth, provider } from "../../firebase";
-import { login, logout, setCurrentUser } from "../actions";
+import { login, logout, setCurrentUser } from "../auth/actions";
 import { eventChannel } from "redux-saga";
 
 function* loginSaga() {

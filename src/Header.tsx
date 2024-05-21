@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { login, logout } from "./redux/actions";
+import { login, logout } from "./redux/auth/actions";
 
 import { createChat } from "./api/chats-api";
 import { RootState } from "./redux/reducers";
