@@ -1,6 +1,14 @@
 import { createAction } from "@reduxjs/toolkit";
-import { User } from "firebase/auth";
 
-export const login = createAction("LOGIN");
+export const login = createAction("LOGIN", (user) => ({
+  payload: {
+    uid: user.uid,
+    displayName: user.displayName,
+  },
+}));
+
 export const logout = createAction("LOGOUT");
-export const setCurrentUser = createAction<User | null>("SET_CURRENT_USER");
+
+export const setCurrentUser = createAction("SET_CURRENT_USER", (user) => ({
+  payload: user ? { uid: user.uid, displayName: user.displayName } : null,
+}));

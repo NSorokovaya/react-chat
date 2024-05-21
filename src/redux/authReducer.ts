@@ -1,9 +1,8 @@
 import { createReducer } from "@reduxjs/toolkit";
 import { login, logout, setCurrentUser } from "./actions";
-import { User } from "firebase/auth";
 
 interface AuthState {
-  currentUser: User | null | undefined;
+  currentUser: { uid: string; displayName: string | null } | null;
 }
 
 const initialState: AuthState = {

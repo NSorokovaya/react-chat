@@ -3,6 +3,8 @@ import { login, logout } from "./redux/actions";
 
 import { createChat } from "./api/chats-api";
 import { RootState } from "./redux/reducers";
+import { signInWithPopup, signOut } from "firebase/auth";
+import { auth, provider } from "./firebase";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -15,12 +17,23 @@ const Header = () => {
     }
   };
 
-  const onSignInClick = () => {
-    dispatch(login());
+  const onSignInClick = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      dispatch(login(user));
+    } catch (error) {
+      console.error("Sign-in failed", error);
+    }
   };
 
-  const onSignOutClick = () => {
-    dispatch(logout());
+  const onSignOutClick = async () => {
+    try {
+      await signOut(auth);
+      dispatch(logout());
+    } catch (error) {
+      console.error("Sign-out failed", error);
+    }
   };
 
   return (
