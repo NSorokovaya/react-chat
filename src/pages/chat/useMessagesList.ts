@@ -28,6 +28,7 @@ export const useMessagesList = (chatId: string) => {
       const messagesData: Message[] = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         text: doc.data().text,
+        creator: doc.data().creator,
       }));
 
       setMessagesList(messagesData.reverse());

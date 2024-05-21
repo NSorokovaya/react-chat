@@ -40,7 +40,7 @@ function createAuthChannel() {
 }
 
 export default function* authSagas() {
-  yield takeLatest(login.type, loginSaga);
-  yield takeLatest(logout.type, logoutSaga);
+  yield takeLatest(login, loginSaga);
+  yield takeLatest(logout, logoutSaga);
   yield call(authStateChangedSaga);
 }
