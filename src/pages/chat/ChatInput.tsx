@@ -1,4 +1,4 @@
-import { KeyboardEvent, useState } from "react";
+import React, { ChangeEvent, KeyboardEvent, useState } from "react";
 import { createTextMessage } from "../../api/messages-api";
 import { auth } from "../../firebase";
 
@@ -25,9 +25,22 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
       await sendMessage();
     }
   };
-
+  const handleAddFile = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.files);
+  };
   return (
     <div className="flex items-center space-x-2">
+      <label>
+        <span>
+          <img src="/clip.svg" alt="Close"></img>
+        </span>
+        <input
+          className="hidden"
+          type="file"
+          accept="image/jpeg, image/png, image/svg+xml"
+          onChange={handleAddFile}
+        />
+      </label>
       <input
         className="flex-grow p-2 border rounded-full focus:outline-none focus:ring focus:border-blue-300"
         type="text"
