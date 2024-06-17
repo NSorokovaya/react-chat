@@ -3,6 +3,7 @@ import ChatInput from "./ChatInput";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useEffect, useRef } from "react";
+import { deleteTextMessage } from "../../api/messages-api";
 
 interface ChatWindowProps {
   chatId: string;
@@ -16,6 +17,11 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
   useEffect(() => {
     messagesScrollRef.current?.lastElementChild?.scrollIntoView();
   }, [messagesList]);
+
+  const onClickDeleteMessage = async (messageId: string) => {
+    console.log("Deleting message with ID:", messageId);
+    await deleteTextMessage({ chatId, messageId });
+  };
 
   return (
     <div className="flex flex-col h-[900px] w-[600px] border-2 border-gray-300 rounded-lg shadow-lg">
@@ -45,11 +51,16 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
                     {message.text}
                   </div>
                 </div>
-                <div className="absolute top-[-20px] right-0 mt-2 mr-2">
-                  <div className="hidden group-hover:block bg-white border border-gray-300 shadow-lg rounded-lg p-2">
-                    X
+                {message.creator === currentUser?.uid && (
+                  <div className="absolute top-[-6px] right-0 mt-2 mr-2">
+                    <div
+                      onClick={() => onClickDeleteMessage(message.id)}
+                      className="hidden group-hover:block bg-gray-100  border-2 border-blue-300 shadow-lg rounded-lg p-1"
+                    >
+                      <img src="/close-icon.svg" alt="Close"></img>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </li>
           ))}

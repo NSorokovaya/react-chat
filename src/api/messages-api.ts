@@ -1,4 +1,10 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 import { db } from "../firebase";
 
@@ -6,6 +12,10 @@ interface CreateTextMessageParams {
   chatId: string;
   text: string;
   creator: string;
+}
+interface DeleteTextMessageParams {
+  chatId: string;
+  messageId: string;
 }
 
 export const createTextMessage = async ({
@@ -19,4 +29,11 @@ export const createTextMessage = async ({
     creator,
     createdAt: serverTimestamp(),
   });
+};
+
+export const deleteTextMessage = async ({
+  chatId,
+  messageId,
+}: DeleteTextMessageParams) => {
+  await deleteDoc(doc(db, `chats/${chatId}/messages`, messageId));
 };
