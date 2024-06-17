@@ -3,7 +3,8 @@ import ChatInput from "./ChatInput";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useEffect, useRef } from "react";
-import { deleteTextMessage } from "../../api/messages-api";
+import { createTextMessage, deleteTextMessage } from "../../api/messages-api";
+import { isSingleEmoji } from "../../utils/functions";
 
 interface ChatWindowProps {
   chatId: string;
@@ -23,47 +24,78 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
     await deleteTextMessage({ chatId, messageId });
   };
 
+  //for empty state
+
+  const sendMessage = async () => {
+    if (currentUser) {
+      await createTextMessage({
+        chatId,
+        text: "🦔",
+        creator: currentUser.uid,
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col h-[900px] w-[600px] border-2 border-gray-300 rounded-lg shadow-lg">
       <div className="flex-grow overflow-y-auto p-4 bg-white">
         <ul className="space-y-2">
-          {messagesList.map((message) => (
-            <li
-              ref={messagesScrollRef}
-              key={message.id}
-              className={`flex relative ${
-                message.creator === currentUser?.uid
-                  ? "justify-end"
-                  : "justify-start "
-              }`}
-            >
-              <div className="flex items-center bg-gray-100 rounded-lg p-4 relative group">
-                <div className="mr-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
-                </div>
-                <div>
-                  <p className="text-gray-600">
-                    {message.creator === currentUser?.uid
-                      ? currentUser.displayName
-                      : "Other Users"}
-                  </p>
-                  <div className="text-black flex justify-start">
-                    {message.text}
+          {messagesList.length ? (
+            messagesList.map((message) => (
+              <li
+                ref={messagesScrollRef}
+                key={message.id}
+                className={`flex relative ${
+                  message.creator === currentUser?.uid
+                    ? "justify-end"
+                    : "justify-start "
+                }`}
+              >
+                <div className="flex items-center bg-gray-100 rounded-lg p-4 relative group">
+                  <div className="mr-3">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
                   </div>
-                </div>
-                {message.creator === currentUser?.uid && (
-                  <div className="absolute top-[-6px] right-0 mt-2 mr-2">
+                  <div>
+                    <p className="text-gray-600">
+                      {message.creator === currentUser?.uid
+                        ? currentUser.displayName
+                        : "Other Users"}
+                    </p>
                     <div
-                      onClick={() => onClickDeleteMessage(message.id)}
-                      className="hidden group-hover:block bg-gray-100  border-2 border-blue-300 shadow-lg rounded-lg p-1"
+                      className={`text-black flex justify-start ${
+                        isSingleEmoji(message.text) ? "text-7xl" : "text-base"
+                      }`}
                     >
-                      <img src="/close-icon.svg" alt="Close"></img>
+                      {message.text}
                     </div>
                   </div>
-                )}
+                  {message.creator === currentUser?.uid && (
+                    <div className="absolute top-[-6px] right-0 mt-2 mr-2">
+                      <div
+                        onClick={() => onClickDeleteMessage(message.id)}
+                        className="hidden group-hover:block bg-gray-100  border-2 border-blue-300 shadow-lg rounded-lg p-1 cursor-pointer"
+                      >
+                        <img src="/close-icon.svg" alt="Close"></img>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))
+          ) : (
+            <div className="flex items-center justify-center ">
+              <div
+                className="flex flex-col items-center top-80 relative p-6 border rounded-lg"
+                onClick={() => {
+                  sendMessage();
+                }}
+              >
+                <p>No messages here yet...</p>
+                <p>Send a message or click on the greeting below</p>
+                <div className=" text-[100px] cursor-pointer">🦔</div>
               </div>
-            </li>
-          ))}
+            </div>
+          )}
         </ul>
       </div>
       <div className="p-4 border-t-2 border-gray-200 bg-gray-50">
