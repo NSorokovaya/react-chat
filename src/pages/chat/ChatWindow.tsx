@@ -8,7 +8,7 @@ import {
   deleteImage,
   deleteTextMessage,
 } from "../../api/messages-api";
-import { isSingleEmoji } from "../../utils/functions";
+import { isSingleEmoji, showDateAndTime } from "../../utils/functions";
 import { ImageMessage, TextMessage } from "../../types/messages";
 import { ref } from "firebase/storage";
 import { storage } from "../../firebase";
@@ -26,14 +26,11 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
     messagesScrollRef.current?.lastElementChild?.scrollIntoView();
   }, [messagesList]);
 
-  const onClickDeleteMessage = async (
-    message: (TextMessage | ImageMessage)[]
-  ) => {
+  const onClickDeleteMessage = async (message: TextMessage | ImageMessage) => {
     const messageId = message.id;
     console.log("Deleting message with ID:", message.id);
     if (message.type === "image") {
       const chatImagesRef = ref(storage, message.url);
-
       await deleteImage({ chatId, messageId, chatImagesRef });
     } else await deleteTextMessage({ chatId, messageId });
   };
@@ -75,7 +72,9 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
                         ? currentUser.displayName
                         : "Other Users"}
                     </p>
-
+                    <div className="text-sm text-gray-400">
+                      {showDateAndTime(message.createdAt)}
+                    </div>
                     {message.type === "text" ? (
                       <div
                         className={`text-black flex justify-start ${
