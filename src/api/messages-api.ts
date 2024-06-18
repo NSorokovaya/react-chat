@@ -7,6 +7,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../firebase";
+import { StorageReference, deleteObject } from "firebase/storage";
 
 interface CreateTextMessageParams {
   chatId: string;
@@ -22,6 +23,9 @@ interface CreateImageMessageParams {
 interface DeleteTextMessageParams {
   chatId: string;
   messageId: string;
+}
+interface DeleteImageMessageParams extends DeleteTextMessageParams {
+  chatImagesRef: StorageReference;
 }
 
 export const createTextMessage = async ({
@@ -59,4 +63,13 @@ export const deleteTextMessage = async ({
   messageId,
 }: DeleteTextMessageParams) => {
   await deleteDoc(doc(db, `chats/${chatId}/messages`, messageId));
+};
+
+export const deleteImage = async ({
+  chatId,
+  messageId,
+  chatImagesRef,
+}: DeleteImageMessageParams) => {
+  await deleteDoc(doc(db, `chats/${chatId}/messages`, messageId));
+  await deleteObject(chatImagesRef);
 };

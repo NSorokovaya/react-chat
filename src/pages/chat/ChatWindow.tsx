@@ -3,8 +3,15 @@ import ChatInput from "./ChatInput";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useEffect, useRef } from "react";
-import { createTextMessage, deleteTextMessage } from "../../api/messages-api";
+import {
+  createTextMessage,
+  deleteImage,
+  deleteTextMessage,
+} from "../../api/messages-api";
 import { isSingleEmoji } from "../../utils/functions";
+import { ImageMessage, TextMessage } from "../../types/messages";
+import { ref } from "firebase/storage";
+import { storage } from "../../firebase";
 
 interface ChatWindowProps {
   chatId: string;
@@ -19,9 +26,16 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
     messagesScrollRef.current?.lastElementChild?.scrollIntoView();
   }, [messagesList]);
 
-  const onClickDeleteMessage = async (messageId: string) => {
-    console.log("Deleting message with ID:", messageId);
-    await deleteTextMessage({ chatId, messageId });
+  const onClickDeleteMessage = async (
+    message: (TextMessage | ImageMessage)[]
+  ) => {
+    const messageId = message.id;
+    console.log("Deleting message with ID:", message.id);
+    if (message.type === "image") {
+      const chatImagesRef = ref(storage, message.url);
+
+      await deleteImage({ chatId, messageId, chatImagesRef });
+    } else await deleteTextMessage({ chatId, messageId });
   };
 
   //for empty state
@@ -61,7 +75,8 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
                         ? currentUser.displayName
                         : "Other Users"}
                     </p>
-                    {message.type !== "image" ? (
+
+                    {message.type === "text" ? (
                       <div
                         className={`text-black flex justify-start ${
                           isSingleEmoji(message.text) ? "text-7xl" : "text-base"
@@ -69,18 +84,20 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
                       >
                         {message.text}
                       </div>
-                    ) : (
+                    ) : null}
+
+                    {message.type === "image" ? (
                       <img
                         src={message.url}
                         alt="Attached Image"
                         className="max-w-xs max-h-xs"
                       />
-                    )}
+                    ) : null}
                   </div>
                   {message.creator === currentUser?.uid && (
                     <div className="absolute top-[-6px] right-0 mt-2 mr-2">
                       <div
-                        onClick={() => onClickDeleteMessage(message.id)}
+                        onClick={() => onClickDeleteMessage(message)}
                         className="hidden group-hover:block bg-gray-100  border-2 border-blue-300 shadow-lg rounded-lg p-1 cursor-pointer"
                       >
                         <img src="/close-icon.svg" alt="Close"></img>

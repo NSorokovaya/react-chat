@@ -8,10 +8,12 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../../firebase";
-import { Message } from "../../types/messages";
+import { ImageMessage, TextMessage } from "../../types/messages";
 
 export const useMessagesList = (chatId: string) => {
-  const [messagesList, setMessagesList] = useState<Message[]>([]);
+  const [messagesList, setMessagesList] = useState<
+    (TextMessage | ImageMessage)[]
+  >([]);
 
   useEffect(() => {
     if (!chatId) {
@@ -25,14 +27,27 @@ export const useMessagesList = (chatId: string) => {
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const messagesData: Message[] = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        text: doc.data().text,
-        creator: doc.data().creator,
-        createdAt: doc.data().createdAt,
-        url: doc.data().url,
-        type: doc.data().type,
-      }));
+      const messagesData: (TextMessage | ImageMessage)[] =
+        querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          if (data.type === "image") {
+            return {
+              id: doc.id,
+              creator: data.creator,
+              createdAt: data.createdAt,
+              type: data.type,
+              url: data.url,
+            } as ImageMessage;
+          } else {
+            return {
+              id: doc.id,
+              creator: data.creator,
+              createdAt: data.createdAt,
+              type: data.type,
+              text: data.text,
+            } as TextMessage;
+          }
+        });
 
       setMessagesList(messagesData.reverse());
     });
