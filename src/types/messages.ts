@@ -3,4 +3,6 @@ export interface Message {
   text: string;
   creator: string;
   createdAt: string;
+  url: string;
+  type: string;
 }

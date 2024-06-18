@@ -55,13 +55,10 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
         await createImageMessage({
           chatId,
           text: "There is some image",
-          url: result.metadata.fullPath,
+          url: url,
           creator: auth.currentUser.uid,
         });
       }
-      // create an image-message in the database
-      // 1. url
-      //2. create separated render
     }
   };
 
@@ -97,3 +94,8 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
 };
 
 export default ChatInput;
+
+// 1. Create types for TextMessage and ImageMessage (extend Message)
+// 2. Delete the image from the bucket on an image message delete
+
+// 3.add date to the message

@@ -61,13 +61,21 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
                         ? currentUser.displayName
                         : "Other Users"}
                     </p>
-                    <div
-                      className={`text-black flex justify-start ${
-                        isSingleEmoji(message.text) ? "text-7xl" : "text-base"
-                      }`}
-                    >
-                      {message.text}
-                    </div>
+                    {message.type !== "image" ? (
+                      <div
+                        className={`text-black flex justify-start ${
+                          isSingleEmoji(message.text) ? "text-7xl" : "text-base"
+                        }`}
+                      >
+                        {message.text}
+                      </div>
+                    ) : (
+                      <img
+                        src={message.url}
+                        alt="Attached Image"
+                        className="max-w-xs max-h-xs"
+                      />
+                    )}
                   </div>
                   {message.creator === currentUser?.uid && (
                     <div className="absolute top-[-6px] right-0 mt-2 mr-2">
