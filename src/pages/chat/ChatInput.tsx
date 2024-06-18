@@ -1,6 +1,7 @@
-import React, { ChangeEvent, KeyboardEvent, useState } from "react";
-import { createTextMessage } from "../../api/messages-api";
-import { auth } from "../../firebase";
+import { ChangeEvent, KeyboardEvent, useState } from "react";
+import { createImageMessage, createTextMessage } from "../../api/messages-api";
+import { auth, storage } from "../../firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 interface ChatInputProps {
   chatId: string;
@@ -25,9 +26,45 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
       await sendMessage();
     }
   };
-  const handleAddFile = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.files);
+  const handleAddFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const [firstImg] = e.target.files || [];
+    // TODO: make sure that file is valid
+
+    if (firstImg) {
+      const validImageTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/svg+xml",
+      ];
+
+      if (!validImageTypes.includes(firstImg.type)) {
+        console.error("Invalid file type. Please select an image.");
+        return;
+      }
+
+      // TODO: make sure that file name is unique
+      const uniqueImageName = `${Date.now()}-${firstImg.name}`;
+
+      const chatImagesRef = ref(storage, `chats/${chatId}/${uniqueImageName}`);
+
+      const result = await uploadBytes(chatImagesRef, firstImg);
+      const url = await getDownloadURL(result.ref);
+      console.log(url, result.metadata.fullPath);
+      if (auth.currentUser) {
+        await createImageMessage({
+          chatId,
+          text: "There is some image",
+          url: result.metadata.fullPath,
+          creator: auth.currentUser.uid,
+        });
+      }
+      // create an image-message in the database
+      // 1. url
+      //2. create separated render
+    }
   };
+
   return (
     <div className="flex items-center space-x-2">
       <label>
