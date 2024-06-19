@@ -1,28 +1,28 @@
-import { useMessagesList } from "../useMessagesList";
-import ChatInput from "../ChatInput";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
 import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
+import ChatInput from "../ChatInput";
 import EmptyStateMessage from "./EmptyStateMessage";
 import ChatMessage from "./ChatMessage";
+import {
+  selectChatId,
+  selectMessagesList,
+} from "../../../redux/messaging/selectors";
+import { selectCurrentUser } from "../../../redux/auth/selectors";
+import { subscribeToMessagesList } from "../../../redux/messaging/actions";
 
-interface ChatWindowProps {
-  chatId: string;
-}
+const ChatWindow = () => {
+  const chatId = useSelector(selectChatId);
+  const currentUser = useSelector(selectCurrentUser);
+  const dispatch = useDispatch();
+  const messagesList = useSelector(selectMessagesList);
+  useEffect(() => {
+    if (chatId) {
+      dispatch(subscribeToMessagesList({ chatId }));
+    }
+  }, [chatId, dispatch]);
 
-// 1. Scroll into the last message on new message
-// 2. Orchestrating message deletion
-// 3. Sending a message
-// 4. Renders (defines UI for):
-// 4.1. Chat Window
-// 4.2. TextMessage
-// 4.3. ImageMessage
-
-const ChatWindow = ({ chatId }: ChatWindowProps) => {
-  const { messagesList } = useMessagesList(chatId);
   const messagesScrollRef = useRef<HTMLLIElement | null>(null);
-  const currentUser = useSelector((state: RootState) => state.auth.currentUser);
 
   useEffect(() => {
     messagesScrollRef.current?.lastElementChild?.scrollIntoView();
@@ -31,7 +31,7 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
   return (
     <div className="flex flex-col h-[900px] w-[600px] border-2 border-gray-300 rounded-lg shadow-lg">
       <div className="flex-grow overflow-y-auto p-4 bg-white">
-        <ul className="space-y-2">
+        <div className="space-y-2">
           {messagesList.length ? (
             messagesList.map((message) => (
               <li
@@ -49,7 +49,7 @@ const ChatWindow = ({ chatId }: ChatWindowProps) => {
           ) : (
             <EmptyStateMessage chatId={chatId} />
           )}
-        </ul>
+        </div>
       </div>
       <div className="p-4 border-t-2 border-gray-200 bg-gray-50">
         <ChatInput chatId={chatId} />

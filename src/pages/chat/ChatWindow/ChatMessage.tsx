@@ -9,7 +9,7 @@ import ChatTextMessage from "./ChatTextMessage";
 import ChatImageMessage from "./ChatImageMessage";
 
 interface Props {
-  message: TextMessage | ImageMessage;
+  message: Message;
   chatId: string;
 }
 
@@ -27,7 +27,7 @@ export default function ChatMessage({ message, chatId }: Props) {
 
   const currentUser = useSelector((state: RootState) => state.auth.currentUser);
 
-  const onClickDeleteMessage = async (message: TextMessage | ImageMessage) => {
+  const onClickDeleteMessage = async (message: Message) => {
     const messageId = message.id;
     console.log("Deleting message with ID:", message.id);
     if (message.type === "image") {
