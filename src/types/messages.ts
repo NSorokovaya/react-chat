@@ -16,3 +16,7 @@ export interface ImageMessage extends Message {
   type: "image";
   url: string;
 }
+
+export interface ChatWindowProps {
+  chatId: string;
+}

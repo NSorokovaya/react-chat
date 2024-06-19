@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import Header from "../../Header";
-import ChatWindow from "./ChatWindow";
+import ChatWindow from "./ChatWindow/ChatWindow";
 
 export const ChatPage = () => {
   const { chatId } = useParams();
