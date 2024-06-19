@@ -22,3 +22,9 @@ export type Message = TextMessage | ImageMessage;
 export interface ChatWindowProps {
   chatId: string;
 }
+
+export interface CreateTextMessageDto {
+  chatId: string;
+  text: string;
+  creator: string;
+}

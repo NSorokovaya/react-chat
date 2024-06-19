@@ -1,22 +1,33 @@
 import { ChangeEvent, KeyboardEvent, useState } from "react";
-import { createImageMessage, createTextMessage } from "../../api/messages-api";
+import { createImageMessage } from "../../api/messages-api";
 import { auth, storage } from "../../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { useDispatch, useSelector } from "react-redux";
+import { addMessage, sendTextMessage } from "../../redux/messaging/actions";
+import { selectChatId } from "../../redux/messaging/selectors";
+import { RootState } from "../../redux/store";
+import { selectCurrentUser } from "../../redux/auth/selectors";
 
-interface ChatInputProps {
-  chatId: string;
-}
+const ChatInput = () => {
+  const dispatch = useDispatch();
 
-const ChatInput = ({ chatId }: ChatInputProps) => {
+  const chatId = useSelector(selectChatId);
+  const currentUser = useSelector(selectCurrentUser);
+
   const [message, setMessage] = useState("");
 
   const sendMessage = async () => {
-    if (auth.currentUser && message.trim() !== "") {
-      await createTextMessage({
-        chatId,
-        text: message,
-        creator: auth.currentUser.uid,
-      });
+    if (currentUser?.uid) {
+      dispatch(
+        sendTextMessage({
+          message: {
+            chatId: chatId,
+            text: message,
+            creator: currentUser.uid,
+          },
+        })
+      );
+
       setMessage("");
     }
   };
@@ -94,8 +105,3 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
 };
 
 export default ChatInput;
-
-// 1. Create types for TextMessage and ImageMessage (extend Message)
-// 2. Delete the image from the bucket on an image message delete
-
-// 3.add date to the message

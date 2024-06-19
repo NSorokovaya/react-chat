@@ -1,5 +1,11 @@
 import { all, call, put, take, takeEvery } from "redux-saga/effects";
-import { setChatId, setMessagesList, subscribeToMessagesList } from "./actions";
+import {
+  addMessage,
+  sendTextMessage,
+  setChatId,
+  setMessagesList,
+  subscribeToMessagesList,
+} from "./actions";
 import { eventChannel } from "redux-saga";
 import { ImageMessage, Message, TextMessage } from "../../types/messages";
 import {
@@ -11,6 +17,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../../firebase";
+import { createTextMessage } from "../../api/messages-api";
 function subscription(chatId: string) {
   return eventChannel((emit) => {
     const q = query(
@@ -61,10 +68,15 @@ function* handleSubscribeToMessagesList(action: any) {
     yield put(setMessagesList({ messagesList: messagesData }));
   }
 }
+function* handleSendTextMessage(action: any) {
+  const { message } = action.payload;
+  yield call(createTextMessage, message);
+}
 
 export default function* rootSaga() {
   yield all([
     takeEvery(setChatId, handleSetChatId),
     takeEvery(subscribeToMessagesList, handleSubscribeToMessagesList),
+    takeEvery(sendTextMessage, handleSendTextMessage),
   ]);
 }

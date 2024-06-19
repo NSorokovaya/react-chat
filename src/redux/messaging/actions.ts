@@ -1,5 +1,5 @@
 import { createAction } from "@reduxjs/toolkit";
-import { Message } from "../../types/messages";
+import { CreateTextMessageDto, Message } from "../../types/messages";
 
 export const setChatId = createAction<{ chatId: string }>(
   "messaging/setChatId"
@@ -11,4 +11,12 @@ export const setMessagesList = createAction<{
 
 export const subscribeToMessagesList = createAction<{ chatId: string }>(
   "messaging/subscribeToMessagesList"
+);
+
+export const addMessage = createAction<{
+  messagesList: Message[];
+}>("messaging/addMessage");
+
+export const sendTextMessage = createAction<{ message: CreateTextMessageDto }>(
+  "messaging/sendTextMessage"
 );

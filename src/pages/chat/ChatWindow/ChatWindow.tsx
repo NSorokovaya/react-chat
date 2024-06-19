@@ -52,7 +52,7 @@ const ChatWindow = () => {
         </div>
       </div>
       <div className="p-4 border-t-2 border-gray-200 bg-gray-50">
-        <ChatInput chatId={chatId} />
+        <ChatInput />
       </div>
     </div>
   );
