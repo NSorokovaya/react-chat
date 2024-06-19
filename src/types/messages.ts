@@ -2,6 +2,7 @@ import { Timestamp } from "firebase/firestore";
 
 interface AbstractMessage {
   id: string;
+  chatId: string;
   creator: string;
   createdAt: Timestamp;
   type: string;
@@ -26,5 +27,10 @@ export interface ChatWindowProps {
 export interface CreateTextMessageDto {
   chatId: string;
   text: string;
+  creator: string;
+}
+export interface CreateImageMessageDto {
+  chatId: string;
+  file: File;
   creator: string;
 }

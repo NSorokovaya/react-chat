@@ -1,5 +1,9 @@
 import { createAction } from "@reduxjs/toolkit";
-import { CreateTextMessageDto, Message } from "../../types/messages";
+import {
+  CreateImageMessageDto,
+  CreateTextMessageDto,
+  Message,
+} from "../../types/messages";
 
 export const setChatId = createAction<{ chatId: string }>(
   "messaging/setChatId"
@@ -20,3 +24,7 @@ export const addMessage = createAction<{
 export const sendTextMessage = createAction<{ message: CreateTextMessageDto }>(
   "messaging/sendTextMessage"
 );
+
+export const sendImageMessage = createAction<{
+  message: CreateImageMessageDto;
+}>("messaging/sendImageMessage");

@@ -1,7 +1,7 @@
 import { createReducer } from "@reduxjs/toolkit";
 
 import { initState } from "./init-state";
-import { addMessage, setChatId, setMessagesList } from "./actions";
+import { setChatId, setMessagesList } from "./actions";
 
 export const messagingReducer = createReducer(initState, (builder) => {
   builder

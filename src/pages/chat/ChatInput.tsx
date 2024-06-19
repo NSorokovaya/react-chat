@@ -3,9 +3,11 @@ import { createImageMessage } from "../../api/messages-api";
 import { auth, storage } from "../../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useDispatch, useSelector } from "react-redux";
-import { addMessage, sendTextMessage } from "../../redux/messaging/actions";
+import {
+  sendImageMessage,
+  sendTextMessage,
+} from "../../redux/messaging/actions";
 import { selectChatId } from "../../redux/messaging/selectors";
-import { RootState } from "../../redux/store";
 import { selectCurrentUser } from "../../redux/auth/selectors";
 
 const ChatInput = () => {
@@ -37,39 +39,20 @@ const ChatInput = () => {
       await sendMessage();
     }
   };
+
   const handleAddFile = async (e: ChangeEvent<HTMLInputElement>) => {
-    const [firstImg] = e.target.files || [];
-    // TODO: make sure that file is valid
+    const [file] = e.target.files || [];
 
-    if (firstImg) {
-      const validImageTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/svg+xml",
-      ];
-
-      if (!validImageTypes.includes(firstImg.type)) {
-        console.error("Invalid file type. Please select an image.");
-        return;
-      }
-
-      // TODO: make sure that file name is unique
-      const uniqueImageName = `${Date.now()}-${firstImg.name}`;
-
-      const chatImagesRef = ref(storage, `chats/${chatId}/${uniqueImageName}`);
-
-      const result = await uploadBytes(chatImagesRef, firstImg);
-      const url = await getDownloadURL(result.ref);
-      console.log(url, result.metadata.fullPath);
-      if (auth.currentUser) {
-        await createImageMessage({
-          chatId,
-          text: "There is some image",
-          url: url,
-          creator: auth.currentUser.uid,
-        });
-      }
+    if (currentUser?.uid && file) {
+      dispatch(
+        sendImageMessage({
+          message: {
+            chatId,
+            file,
+            creator: currentUser.uid,
+          },
+        })
+      );
     }
   };
 
