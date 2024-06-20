@@ -1,7 +1,4 @@
 import { ChangeEvent, KeyboardEvent, useState } from "react";
-import { createImageMessage } from "../../api/messages-api";
-import { auth, storage } from "../../firebase";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useDispatch, useSelector } from "react-redux";
 import {
   sendImageMessage,

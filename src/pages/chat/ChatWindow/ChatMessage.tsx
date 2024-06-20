@@ -1,4 +1,3 @@
-import { ImageMessage, TextMessage } from "../../../types/messages";
 import { deleteImage, deleteTextMessage } from "../../../api/messages-api";
 import { showDateAndTime } from "../../../utils/functions";
 import { ref } from "firebase/storage";
@@ -7,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import ChatTextMessage from "./ChatTextMessage";
 import ChatImageMessage from "./ChatImageMessage";
+import { Message } from "../../../types/messages";
 
 interface Props {
   message: Message;

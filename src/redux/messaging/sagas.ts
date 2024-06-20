@@ -7,7 +7,13 @@ import {
   subscribeToMessagesList,
 } from "./actions";
 import { eventChannel } from "redux-saga";
-import { ImageMessage, Message, TextMessage } from "../../types/messages";
+import {
+  CreateImageMessageDto,
+  CreateTextMessageDto,
+  ImageMessage,
+  Message,
+  TextMessage,
+} from "../../types/messages";
 import {
   collection,
   limit,
@@ -60,13 +66,17 @@ function subscription(chatId: string) {
   });
 }
 
-function* handleSetChatId(action: any) {
+function* handleSetChatId(action: { payload: { chatId: string } }) {
   yield call(console.log, action, "Hello from saga");
 }
 
-function* handleSubscribeToMessagesList(action: any) {
+function* handleSubscribeToMessagesList(action: {
+  payload: { chatId: string };
+}) {
   const { chatId } = action.payload;
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const channel = yield call(subscription, chatId);
 
   while (true) {
@@ -74,11 +84,15 @@ function* handleSubscribeToMessagesList(action: any) {
     yield put(setMessagesList({ messagesList: messagesData }));
   }
 }
-function* handleSendTextMessage(action: any) {
+function* handleSendTextMessage(action: {
+  payload: { message: CreateTextMessageDto };
+}) {
   const { message } = action.payload;
   yield call(createTextMessage, message);
 }
-function* handleSendImageMessage(action: any) {
+function* handleSendImageMessage(action: {
+  payload: { message: CreateImageMessageDto };
+}) {
   const { message } = action.payload;
   console.log(message);
   if (message) {
