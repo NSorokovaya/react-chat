@@ -28,3 +28,8 @@ export const sendTextMessage = createAction<{ message: CreateTextMessageDto }>(
 export const sendImageMessage = createAction<{
   message: CreateImageMessageDto;
 }>("messaging/sendImageMessage");
+
+export const loadMoreMessages = createAction<{
+  chatId: string;
+  lastDoc: any;
+}>("messaging/loadMoreMessages");

@@ -1,5 +1,6 @@
 import { all, call, put, take, takeEvery } from "redux-saga/effects";
 import {
+  loadMoreMessages,
   sendImageMessage,
   sendTextMessage,
   setChatId,
@@ -16,10 +17,12 @@ import {
 } from "../../types/messages";
 import {
   collection,
+  getDocs,
   limit,
   onSnapshot,
   orderBy,
   query,
+  startAfter,
 } from "firebase/firestore";
 
 import { db, storage } from "../../firebase";
@@ -32,12 +35,19 @@ import {
 } from "firebase/storage";
 function subscription(chatId: string) {
   return eventChannel((emit) => {
-    const q = query(
+    let q = query(
       collection(db, `chats/${chatId}/messages`),
       orderBy("createdAt", "desc"),
       limit(10)
     );
-
+    // if (lastDoc) {
+    //   q = query(
+    //     collection(db, `chats/${chatId}/messages`),
+    //     orderBy("createdAt", "desc"),
+    //     startAfter(lastDoc),
+    //     limit(10)
+    //   );
+    // }
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const messagesData: Message[] = querySnapshot.docs.map((doc) => {
         const data = doc.data();
@@ -84,6 +94,44 @@ function* handleSubscribeToMessagesList(action: {
     yield put(setMessagesList({ messagesList: messagesData }));
   }
 }
+
+function* handleLoadMoreMessages(action: {
+  payload: { chatId: string; lastDoc: any };
+}) {
+  const { chatId, lastDoc } = action.payload;
+  const q = query(
+    collection(db, `chats/${chatId}/messages`),
+    orderBy("createdAt", "desc"),
+    startAfter(lastDoc),
+    limit(10)
+  );
+  const querySnapshot = yield call(getDocs, q);
+  const messagesData: Message[] = querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    return data.type === "image"
+      ? ({
+          id: doc.id,
+          creator: data.creator,
+          createdAt: data.createdAt,
+          type: data.type,
+          url: data.url,
+        } as ImageMessage)
+      : ({
+          id: doc.id,
+          creator: data.creator,
+          createdAt: data.createdAt,
+          type: data.type,
+          text: data.text,
+        } as TextMessage);
+  });
+  yield put(
+    loadMoreMessages({
+      messagesList: messagesData,
+      lastDoc: querySnapshot.docs[querySnapshot.docs.length - 1],
+    })
+  );
+}
+
 function* handleSendTextMessage(action: {
   payload: { message: CreateTextMessageDto };
 }) {
@@ -136,5 +184,6 @@ export default function* rootSaga() {
     takeEvery(subscribeToMessagesList, handleSubscribeToMessagesList),
     takeEvery(sendTextMessage, handleSendTextMessage),
     takeEvery(sendImageMessage, handleSendImageMessage),
+    takeEvery(loadMoreMessages, handleLoadMoreMessages),
   ]);
 }

@@ -1,7 +1,7 @@
 import { createReducer } from "@reduxjs/toolkit";
 
 import { initState } from "./init-state";
-import { setChatId, setMessagesList } from "./actions";
+import { loadMoreMessages, setChatId, setMessagesList } from "./actions";
 
 export const messagingReducer = createReducer(initState, (builder) => {
   builder
@@ -10,5 +10,8 @@ export const messagingReducer = createReducer(initState, (builder) => {
     })
     .addCase(setMessagesList, (state, { payload }) => {
       state.messagesList = payload.messagesList;
+    })
+    .addCase(loadMoreMessages, (state, { payload }) => {
+      state.messagesList = [...payload.messagesList, ...state.messagesList];
     });
 });

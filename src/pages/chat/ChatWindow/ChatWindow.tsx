@@ -9,18 +9,30 @@ import {
   selectMessagesList,
 } from "../../../redux/messaging/selectors";
 import { selectCurrentUser } from "../../../redux/auth/selectors";
-import { subscribeToMessagesList } from "../../../redux/messaging/actions";
+import {
+  loadMoreMessages,
+  subscribeToMessagesList,
+} from "../../../redux/messaging/actions";
+import { RootState } from "../../../redux/store";
 
 const ChatWindow = () => {
   const chatId = useSelector(selectChatId);
   const currentUser = useSelector(selectCurrentUser);
   const dispatch = useDispatch();
   const messagesList = useSelector(selectMessagesList);
+  const lastDoc = useSelector((state: RootState) => state.messaging.lastDoc);
+  const loading = useSelector((state: RootState) => state.messaging.loading);
   useEffect(() => {
     if (chatId) {
       dispatch(subscribeToMessagesList({ chatId }));
     }
   }, [chatId, dispatch]);
+
+  const handleLoadMore = () => {
+    if (!loading && lastDoc) {
+      dispatch(loadMoreMessages({ chatId, lastDoc }));
+    }
+  };
 
   const messagesScrollRef = useRef<HTMLLIElement | null>(null);
 
@@ -32,7 +44,7 @@ const ChatWindow = () => {
     <div className="flex flex-col h-[900px] w-[600px] border-2 border-gray-300 rounded-lg shadow-lg">
       <div className="flex-grow overflow-y-auto p-4 bg-white">
         <div className="space-y-2">
-          {messagesList.length ? (
+          {messagesList ? (
             messagesList.map((message) => (
               <li
                 ref={messagesScrollRef}
@@ -50,6 +62,9 @@ const ChatWindow = () => {
             <EmptyStateMessage chatId={chatId} />
           )}
         </div>
+        <button onClick={handleLoadMore} disabled={loading || !lastDoc}>
+          {loading ? "Loading..." : "Load More"}
+        </button>
       </div>
       <div className="p-4 border-t-2 border-gray-200 bg-gray-50">
         <ChatInput />
