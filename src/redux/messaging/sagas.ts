@@ -35,19 +35,12 @@ import {
 } from "firebase/storage";
 function subscription(chatId: string) {
   return eventChannel((emit) => {
-    let q = query(
+    const q = query(
       collection(db, `chats/${chatId}/messages`),
       orderBy("createdAt", "desc"),
       limit(10)
     );
-    // if (lastDoc) {
-    //   q = query(
-    //     collection(db, `chats/${chatId}/messages`),
-    //     orderBy("createdAt", "desc"),
-    //     startAfter(lastDoc),
-    //     limit(10)
-    //   );
-    // }
+
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const messagesData: Message[] = querySnapshot.docs.map((doc) => {
         const data = doc.data();
@@ -105,29 +98,27 @@ function* handleLoadMoreMessages(action: {
     startAfter(lastDoc),
     limit(10)
   );
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const querySnapshot = yield call(getDocs, q);
-  const messagesData: Message[] = querySnapshot.docs.map((doc) => {
+  const messagesData = querySnapshot.docs.map((doc) => {
     const data = doc.data();
-    return data.type === "image"
-      ? ({
-          id: doc.id,
-          creator: data.creator,
-          createdAt: data.createdAt,
-          type: data.type,
-          url: data.url,
-        } as ImageMessage)
-      : ({
-          id: doc.id,
-          creator: data.creator,
-          createdAt: data.createdAt,
-          type: data.type,
-          text: data.text,
-        } as TextMessage);
+    return {
+      id: doc.id,
+      creator: data.creator,
+      createdAt: data.createdAt,
+      type: data.type,
+      ...(data.type === "image" ? { url: data.url } : { text: data.text }),
+    };
   });
+  const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+
   yield put(
     loadMoreMessages({
+      chatId,
+      lastDoc: newLastDoc,
       messagesList: messagesData,
-      lastDoc: querySnapshot.docs[querySnapshot.docs.length - 1],
     })
   );
 }

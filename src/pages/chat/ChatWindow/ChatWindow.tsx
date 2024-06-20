@@ -21,7 +21,7 @@ const ChatWindow = () => {
   const dispatch = useDispatch();
   const messagesList = useSelector(selectMessagesList);
   const lastDoc = useSelector((state: RootState) => state.messaging.lastDoc);
-  const loading = useSelector((state: RootState) => state.messaging.loading);
+
   useEffect(() => {
     if (chatId) {
       dispatch(subscribeToMessagesList({ chatId }));
@@ -29,7 +29,8 @@ const ChatWindow = () => {
   }, [chatId, dispatch]);
 
   const handleLoadMore = () => {
-    if (!loading && lastDoc) {
+    if (lastDoc && messagesList.length > 0) {
+      const lastDoc = messagesList[messagesList.length - 1];
       dispatch(loadMoreMessages({ chatId, lastDoc }));
     }
   };
@@ -43,6 +44,7 @@ const ChatWindow = () => {
   return (
     <div className="flex flex-col h-[900px] w-[600px] border-2 border-gray-300 rounded-lg shadow-lg">
       <div className="flex-grow overflow-y-auto p-4 bg-white">
+        <button onClick={handleLoadMore}>Load More</button>
         <div className="space-y-2">
           {messagesList ? (
             messagesList.map((message) => (
@@ -62,9 +64,6 @@ const ChatWindow = () => {
             <EmptyStateMessage chatId={chatId} />
           )}
         </div>
-        <button onClick={handleLoadMore} disabled={loading || !lastDoc}>
-          {loading ? "Loading..." : "Load More"}
-        </button>
       </div>
       <div className="p-4 border-t-2 border-gray-200 bg-gray-50">
         <ChatInput />
