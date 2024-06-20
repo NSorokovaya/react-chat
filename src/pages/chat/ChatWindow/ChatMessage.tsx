@@ -55,7 +55,7 @@ export default function ChatMessage({ message, chatId }: Props) {
       {message.creator === currentUser?.uid && (
         <div className="absolute top-[-6px] right-0 mt-2 mr-2">
           <div
-            onClick={() => onClickDeleteMessage}
+            onClick={() => onClickDeleteMessage(message)}
             className="hidden group-hover:block bg-gray-100  border-2 border-blue-300 shadow-lg rounded-lg p-1 cursor-pointer"
           >
             <img src="/close-icon.svg" alt="Close"></img>
