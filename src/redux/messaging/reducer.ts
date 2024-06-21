@@ -1,7 +1,7 @@
 import { createReducer } from "@reduxjs/toolkit";
 
 import { initState } from "./init-state";
-import { loadMoreMessages, setChatId, setMessagesList } from "./actions";
+import { setChatId, setMessagesList, setMoreMessages } from "./actions";
 
 export const messagingReducer = createReducer(initState, (builder) => {
   builder
@@ -11,7 +11,10 @@ export const messagingReducer = createReducer(initState, (builder) => {
     .addCase(setMessagesList, (state, { payload }) => {
       state.messagesList = payload.messagesList;
     })
-    .addCase(loadMoreMessages, (state, { payload }) => {
-      state.messagesList = [...payload.messagesList, ...state.messagesList];
+    .addCase(setMoreMessages, (state, { payload }) => {
+      state.messagesList = [
+        ...state.messagesList,
+        ...payload.messagesList,
+      ].sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
     });
 });

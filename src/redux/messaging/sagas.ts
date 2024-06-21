@@ -1,10 +1,11 @@
-import { all, call, put, take, takeEvery } from "redux-saga/effects";
+import { all, call, put, select, take, takeEvery } from "redux-saga/effects";
 import {
   loadMoreMessages,
   sendImageMessage,
   sendTextMessage,
   setChatId,
   setMessagesList,
+  setMoreMessages,
   subscribeToMessagesList,
 } from "./actions";
 import { eventChannel } from "redux-saga";
@@ -16,7 +17,11 @@ import {
   TextMessage,
 } from "../../types/messages";
 import {
+  DocumentData,
+  QuerySnapshot,
   collection,
+  doc,
+  endBefore,
   getDocs,
   limit,
   onSnapshot,
@@ -33,6 +38,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
+import { selectMessagesList } from "./selectors";
 function subscription(chatId: string) {
   return eventChannel((emit) => {
     const q = query(
@@ -88,21 +94,26 @@ function* handleSubscribeToMessagesList(action: {
   }
 }
 
-function* handleLoadMoreMessages(action: {
-  payload: { chatId: string; lastDoc: any };
-}) {
-  const { chatId, lastDoc } = action.payload;
+function* handleLoadMoreMessages(action: { payload: { chatId: string } }) {
+  const { chatId } = action.payload;
+
+  const messagesList: Message[] = yield select(selectMessagesList);
+  console.log("Current messagesList:", messagesList);
+  const lastMessage = messagesList[messagesList.length - 1];
+  console.log(lastMessage.id);
+
+  console.log("Last message:", lastMessage);
+  const lastDoc = doc(db, `chats/${chatId}/messages/${lastMessage.id}`);
+  console.log("Last document reference:", lastDoc);
   const q = query(
     collection(db, `chats/${chatId}/messages`),
-    orderBy("createdAt", "desc"),
-    startAfter(lastDoc),
+    orderBy("createdAt", "asc"),
+    endBefore(lastDoc),
     limit(10)
   );
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const querySnapshot = yield call(getDocs, q);
-  const messagesData = querySnapshot.docs.map((doc) => {
+  const queryResult: QuerySnapshot<DocumentData> = yield call(getDocs, q);
+  const messagesData = queryResult.docs.map((doc) => {
     const data = doc.data();
     return {
       id: doc.id,
@@ -112,14 +123,16 @@ function* handleLoadMoreMessages(action: {
       ...(data.type === "image" ? { url: data.url } : { text: data.text }),
     };
   });
-  const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+  console.log("Loaded messagesData:", messagesData);
 
+  console.log([...messagesData, ...messagesList]);
+  // yield put(
+  //   loadMoreMessages({
+  //     chatId,
+  //   })
+  // );
   yield put(
-    loadMoreMessages({
-      chatId,
-      lastDoc: newLastDoc,
-      messagesList: messagesData,
-    })
+    setMoreMessages({ messagesList: [...messagesData, ...messagesList] })
   );
 }
 

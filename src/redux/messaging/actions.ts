@@ -31,5 +31,8 @@ export const sendImageMessage = createAction<{
 
 export const loadMoreMessages = createAction<{
   chatId: string;
-  lastDoc: any;
 }>("messaging/loadMoreMessages");
+
+export const setMoreMessages = createAction<{
+  messagesList: Message[];
+}>("messaging/setMoreMessages");

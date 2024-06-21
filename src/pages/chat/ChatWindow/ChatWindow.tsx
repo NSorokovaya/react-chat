@@ -13,14 +13,13 @@ import {
   loadMoreMessages,
   subscribeToMessagesList,
 } from "../../../redux/messaging/actions";
-import { RootState } from "../../../redux/store";
 
 const ChatWindow = () => {
+  const dispatch = useDispatch();
+
   const chatId = useSelector(selectChatId);
   const currentUser = useSelector(selectCurrentUser);
-  const dispatch = useDispatch();
   const messagesList = useSelector(selectMessagesList);
-  const lastDoc = useSelector((state: RootState) => state.messaging.lastDoc);
 
   useEffect(() => {
     if (chatId) {
@@ -29,10 +28,7 @@ const ChatWindow = () => {
   }, [chatId, dispatch]);
 
   const handleLoadMore = () => {
-    if (lastDoc && messagesList.length > 0) {
-      const lastDoc = messagesList[messagesList.length - 1];
-      dispatch(loadMoreMessages({ chatId, lastDoc }));
-    }
+    dispatch(loadMoreMessages({ chatId }));
   };
 
   const messagesScrollRef = useRef<HTMLLIElement | null>(null);
