@@ -19,9 +19,11 @@ import {
 import {
   DocumentData,
   QuerySnapshot,
+  Timestamp,
   collection,
   doc,
   endBefore,
+  getDoc,
   getDocs,
   limit,
   onSnapshot,
@@ -98,17 +100,16 @@ function* handleLoadMoreMessages(action: { payload: { chatId: string } }) {
   const { chatId } = action.payload;
 
   const messagesList: Message[] = yield select(selectMessagesList);
-  console.log("Current messagesList:", messagesList);
-  const lastMessage = messagesList[messagesList.length - 1];
-  console.log(lastMessage.id);
+  const lastMessage = messagesList[0];
 
-  console.log("Last message:", lastMessage);
-  const lastDoc = doc(db, `chats/${chatId}/messages/${lastMessage.id}`);
-  console.log("Last document reference:", lastDoc);
+  const lastMessageCreatedAt = new Timestamp(
+    lastMessage.createdAt.seconds,
+    lastMessage.createdAt.nanoseconds
+  );
   const q = query(
     collection(db, `chats/${chatId}/messages`),
-    orderBy("createdAt", "asc"),
-    endBefore(lastDoc),
+    orderBy("createdAt", "desc"),
+    startAfter(lastMessageCreatedAt),
     limit(10)
   );
 
@@ -120,20 +121,11 @@ function* handleLoadMoreMessages(action: { payload: { chatId: string } }) {
       creator: data.creator,
       createdAt: data.createdAt,
       type: data.type,
+      chatId: data.chatId,
       ...(data.type === "image" ? { url: data.url } : { text: data.text }),
     };
   });
-  console.log("Loaded messagesData:", messagesData);
-
-  console.log([...messagesData, ...messagesList]);
-  // yield put(
-  //   loadMoreMessages({
-  //     chatId,
-  //   })
-  // );
-  yield put(
-    setMoreMessages({ messagesList: [...messagesData, ...messagesList] })
-  );
+  yield put(setMoreMessages({ messagesList: messagesData }));
 }
 
 function* handleSendTextMessage(action: {
