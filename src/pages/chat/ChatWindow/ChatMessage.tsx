@@ -37,7 +37,7 @@ export default function ChatMessage({ message, chatId }: Props) {
   };
 
   return (
-    <div className="flex items-center bg-gray-100 rounded-lg p-4 relative group">
+    <div className="flex items-center bg-gray-100 rounded-lg p-4 relative group max-w-[300px]">
       <div className="mr-3">
         <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
       </div>
