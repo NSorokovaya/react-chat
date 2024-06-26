@@ -1,3 +1,5 @@
+import React from "react";
+
 import { deleteImage, deleteTextMessage } from "../../../api/messages-api";
 import { showDateAndTime } from "../../../utils/functions";
 import { ref } from "firebase/storage";
@@ -13,7 +15,7 @@ interface Props {
   chatId: string;
 }
 
-export default function ChatMessage({ message, chatId }: Props) {
+function ChatMessage({ message, chatId }: Props) {
   const switchMessage = () => {
     switch (message.type) {
       case "text":
@@ -65,3 +67,19 @@ export default function ChatMessage({ message, chatId }: Props) {
     </div>
   );
 }
+
+function arePropsEqual(prev, next) {
+  return (
+    prev.message.id === next.message.id &&
+    prev.message.chatId === next.message.chatId &&
+    prev.message.creator === next.message.creator &&
+    prev.message.createdAt?.nanoseconds ===
+      next.message.createdAt?.nanoseconds &&
+    prev.message.type === next.message.type &&
+    prev.message.text === next.message.text &&
+    prev.message.url === next.message.url &&
+    prev.chatId === next.chatId
+  );
+}
+
+export const MemoizedChatMessage = React.memo(ChatMessage, arePropsEqual);
