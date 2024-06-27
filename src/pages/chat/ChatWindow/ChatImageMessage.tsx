@@ -11,10 +11,7 @@ export default function ChatImageMessage({ message }: Props) {
     setImageLoaded(true);
   };
   return (
-    <div
-      className="image-container"
-      style={{ width: "300px", height: "200px", position: "relative" }}
-    >
+    <div className="image-container mt-2">
       <img
         src={message.url}
         alt="Attached Image"

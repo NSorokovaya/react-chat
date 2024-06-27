@@ -75,8 +75,12 @@ export default function ChatMessageList() {
             return (
               <React.Fragment key={message.id}>
                 {showDate && (
-                  <div className="date-time">
-                    {showDateAndTime(message.createdAt)}
+                  <div className="date-time flex items-center">
+                    <div className=" h-[1px] bg-blue-100 w-full"></div>
+                    <div className="w-full flex justify-center text-gray-500 text-sm/[20px]">
+                      {showDateAndTime(message.createdAt)}
+                    </div>
+                    <div className="h-[1px] bg-blue-100 w-full"></div>
                   </div>
                 )}
                 <li

@@ -39,18 +39,20 @@ function ChatMessage({ message, chatId }: Props) {
   };
 
   return (
-    <div className="flex items-center bg-gray-100 rounded-lg p-4 relative group max-w-[300px]">
-      <div className="mr-3">
+    <div className="flex items-start bg-gray-100 rounded-lg p-4 relative group max-w-[350px]">
+      <div className="mr-3 mt-2">
         <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
       </div>
       <div>
-        <p className="text-gray-600">
-          {message.creator === currentUser?.uid
-            ? currentUser.displayName
-            : "Other Users"}
-        </p>
-        <div className="text-sm text-gray-400">
-          {showDateAndTime(message.createdAt)}
+        <div className="flex flex-row items-baseline gap-2">
+          <p className="text-gray-600">
+            {message.creator === currentUser?.uid
+              ? currentUser.displayName
+              : "Other Users"}
+          </p>
+          <p className="text-sm text-gray-400">
+            {showDateAndTime(message.createdAt)}
+          </p>
         </div>
         {switchMessage()}
       </div>

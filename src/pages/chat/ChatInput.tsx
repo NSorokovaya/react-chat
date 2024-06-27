@@ -86,11 +86,11 @@ const ChatInput = () => {
 
 export default ChatInput;
 
-// 1. remove horizontal scrollbar in the messages list
+// 1. remove horizontal scrollbar in the messages list  -- done
 // 2. add styles to the messages separator
 // 3. add sending file messages on ctrl + v
 // 4. update message styles
-
+// changed scroll with css
 // ---
 
 // -. show other users
