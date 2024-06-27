@@ -98,11 +98,15 @@ function* handleLoadMoreMessages(action: { payload: { chatId: string } }) {
 
   const messagesList: Message[] = yield select(selectMessagesList);
   const lastMessage = messagesList[0];
+  if (!lastMessage) {
+    return;
+  }
 
   const lastMessageCreatedAt = new Timestamp(
     lastMessage.createdAt.seconds,
     lastMessage.createdAt.nanoseconds
   );
+
   const q = query(
     collection(db, `chats/${chatId}/messages`),
     orderBy("createdAt", "desc"),
@@ -148,6 +152,8 @@ function* handleSendImageMessage(action: {
       console.error("Invalid file type. Please select an image.");
       return;
     }
+
+    // TODO: add file size check
 
     const uniqueImageName = `${Date.now()}-${message.file.name}`;
 

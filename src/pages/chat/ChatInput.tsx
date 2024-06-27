@@ -53,6 +53,21 @@ const ChatInput = () => {
     }
   };
 
+  const handlePasteFile = async (clipboardData: DataTransferItemList) => {
+    console.log(clipboardData);
+    const file = clipboardData[0].getAsFile();
+    if (currentUser?.uid && file) {
+      dispatch(
+        sendImageMessage({
+          message: {
+            chatId,
+            file,
+            creator: currentUser.uid,
+          },
+        })
+      );
+    }
+  };
   return (
     <div className="flex items-center space-x-2">
       <label>
@@ -73,6 +88,7 @@ const ChatInput = () => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={onKeyDown}
+        onPaste={(e) => handlePasteFile(e.clipboardData.items)}
       />
       <button
         className="p-2 bg-blue-500 text-white rounded-full focus:outline-none hover:bg-blue-600"
@@ -87,13 +103,19 @@ const ChatInput = () => {
 export default ChatInput;
 
 // 1. remove horizontal scrollbar in the messages list  -- done
-// 2. add styles to the messages separator
-// 3. add sending file messages on ctrl + v
-// 4. update message styles
-// changed scroll with css
+// 2. add styles to the messages separator -- done
+// 3. add sending file messages on ctrl + v --done
+// 4. update message styles -- ?? idk if done
+// 5. changed scroll with css -- load more messages isn't working
+//6. fix image sending(nanoseconds)
 // ---
 
 // -. show other users
 // -. add audio messages
 // -. add links preview (functions)
 // -. add presense (realtime database)
+// -. add upload file loading state
+// -. add upload file error state
+// -. add send message optimistic response
+// -. add messages list virtualization
+// -. add messages list add/remove animation

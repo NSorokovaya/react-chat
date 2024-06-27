@@ -4,26 +4,14 @@ import {
   selectChatId,
   selectMessagesList,
 } from "../../../redux/messaging/selectors";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   loadMoreMessages,
   subscribeToMessagesList,
 } from "../../../redux/messaging/actions";
 import { MemoizedChatMessage } from "./ChatMessage";
 import EmptyStateMessage from "./EmptyStateMessage";
-import { showDateAndTime } from "../../../utils/functions";
-import { Timestamp } from "firebase/firestore";
-
-function isDifferentDay(timestamp1: Timestamp, timestamp2: Timestamp) {
-  const date1 = timestamp1.toDate(); // Convert Firestore Timestamp to JavaScript Date
-  const date2 = timestamp2.toDate(); // Convert Firestore Timestamp to JavaScript Date
-
-  return (
-    date1.getFullYear() !== date2.getFullYear() ||
-    date1.getMonth() !== date2.getMonth() ||
-    date1.getDate() !== date2.getDate()
-  );
-}
+import { isDifferentDay, showDateAndTime } from "../../../utils/functions";
 
 export default function ChatMessageList() {
   const dispatch = useDispatch();
@@ -32,59 +20,84 @@ export default function ChatMessageList() {
   const currentUser = useSelector(selectCurrentUser);
   const messagesList = useSelector(selectMessagesList);
 
+  const filteredMessagesList = messagesList.filter((m) => !!m.createdAt);
+
   useEffect(() => {
     if (chatId) {
       dispatch(subscribeToMessagesList({ chatId }));
     }
   }, [chatId, dispatch]);
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const messagesScrollRef = useRef<HTMLLIElement | null>(null);
+  // const messagesScrollRef = useRef<HTMLLIElement | null>(null);
 
   // TODO: do with a CSS (flex-direction: column-reverse;)
-  useEffect(() => {
-    messagesScrollRef.current?.lastElementChild?.scrollIntoView();
-  }, [messagesList]);
+  // useEffect(() => {
+  //   messagesScrollRef.current?.lastElementChild?.scrollIntoView();
+  // }, [messagesList]);
 
-  const handleScroll = () => {
-    const container = containerRef.current;
-    if (container) {
-      if (container.scrollTop === 0) {
+  // const handleScroll = () => {
+  //   console.log("handle scroll");
+  //   const container = containerRef.current;
+  //   console.log("container");
+  //   if (container) {
+  //     if (container.scrollTop === 0) {
+  //       console.log("loadmore");
+  //       dispatch(loadMoreMessages({ chatId }));
+  //     }
+  //   }
+  // };
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
         dispatch(loadMoreMessages({ chatId }));
       }
+    }, options);
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
-  };
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, [dispatch, chatId]);
 
   return (
-    <div
-      ref={containerRef}
-      className="flex-grow overflow-y-auto p-4 bg-white"
-      onScroll={handleScroll}
-    >
-      <div className="space-y-2">
-        {messagesList ? (
-          messagesList.map((message, index) => {
-            console.log(message.createdAt.nanoseconds);
+    <div className="flex-grow overflow-y-auto p-4  bg-white flex flex-col-reverse">
+      <div className="space-y-2 ">
+        {filteredMessagesList ? (
+          filteredMessagesList.map((message, index) => {
             const showDate =
               index === 0 ||
               isDifferentDay(
                 message.createdAt,
-                messagesList[index - 1].createdAt
+                filteredMessagesList[index - 1].createdAt
               );
 
             return (
               <React.Fragment key={message.id}>
                 {showDate && (
-                  <div className="date-time flex items-center">
+                  <div className="date-time flex items-center  ">
                     <div className=" h-[1px] bg-blue-100 w-full"></div>
-                    <div className="w-full flex justify-center text-gray-500 text-sm/[20px]">
+                    <div className="w-full flex justify-center text-gray-500 text-sm/[20px] ">
                       {showDateAndTime(message.createdAt)}
                     </div>
                     <div className="h-[1px] bg-blue-100 w-full"></div>
                   </div>
                 )}
                 <li
-                  ref={messagesScrollRef}
+                  // ref={messagesScrollRef}
                   key={message.id}
                   className={`flex relative ${
                     message.creator === currentUser?.uid
@@ -101,9 +114,8 @@ export default function ChatMessageList() {
           <EmptyStateMessage chatId={chatId} />
         )}
       </div>
+
+      <div ref={containerRef} />
     </div>
   );
 }
-
-//пустые сообщения исправить
-//сделать сепараторы

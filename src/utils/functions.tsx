@@ -38,3 +38,13 @@ export const convertTextToLinks = (text: string) => {
     )
   );
 };
+export function isDifferentDay(timestamp1: Timestamp, timestamp2: Timestamp) {
+  const date1 = timestamp1.toDate(); // Convert Firestore Timestamp to JavaScript Date
+  const date2 = timestamp2.toDate(); // Convert Firestore Timestamp to JavaScript Date
+
+  return (
+    date1.getFullYear() !== date2.getFullYear() ||
+    date1.getMonth() !== date2.getMonth() ||
+    date1.getDate() !== date2.getDate()
+  );
+}

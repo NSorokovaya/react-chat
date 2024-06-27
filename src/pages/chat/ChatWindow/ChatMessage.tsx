@@ -39,12 +39,12 @@ function ChatMessage({ message, chatId }: Props) {
   };
 
   return (
-    <div className="flex items-start bg-gray-100 rounded-lg p-4 relative group max-w-[350px]">
-      <div className="mr-3 mt-2">
+    <div className="flex items-start  rounded-lg p-4 relative group max-w-[350px]">
+      <div className="mr-3 mt-1">
         <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
       </div>
       <div>
-        <div className="flex flex-row items-baseline gap-2">
+        <div className="flex flex-row items-baseline gap-2 mb-3">
           <p className="text-gray-600">
             {message.creator === currentUser?.uid
               ? currentUser.displayName
