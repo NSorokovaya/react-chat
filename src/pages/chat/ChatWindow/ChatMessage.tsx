@@ -68,16 +68,25 @@ function ChatMessage({ message, chatId }: Props) {
   );
 }
 
-function arePropsEqual(prev, next) {
+function arePropsEqual(prev: Props, next: Props) {
+  if (prev.message.type !== next.message.type) {
+    return false;
+  }
+
+  let isContentEqual = false;
+  if (prev.message.type === "text" && next.message.type === "text") {
+    isContentEqual = prev.message.text === next.message.text;
+  } else if (prev.message.type === "image" && next.message.type === "image") {
+    isContentEqual = prev.message.url === next.message.url;
+  }
+
   return (
     prev.message.id === next.message.id &&
     prev.message.chatId === next.message.chatId &&
     prev.message.creator === next.message.creator &&
     prev.message.createdAt?.nanoseconds ===
       next.message.createdAt?.nanoseconds &&
-    prev.message.type === next.message.type &&
-    prev.message.text === next.message.text &&
-    prev.message.url === next.message.url &&
+    isContentEqual &&
     prev.chatId === next.chatId
   );
 }

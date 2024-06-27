@@ -16,7 +16,7 @@ const ChatInput = () => {
   const [message, setMessage] = useState("");
 
   const sendMessage = async () => {
-    if (currentUser?.uid) {
+    if (currentUser?.uid && message !== "") {
       dispatch(
         sendTextMessage({
           message: {
@@ -85,3 +85,15 @@ const ChatInput = () => {
 };
 
 export default ChatInput;
+
+// 1. remove horizontal scrollbar in the messages list
+// 2. add styles to the messages separator
+// 3. add sending file messages on ctrl + v
+// 4. update message styles
+
+// ---
+
+// -. show other users
+// -. add audio messages
+// -. add links preview (functions)
+// -. add presense (realtime database)

@@ -1,6 +1,6 @@
 import ChatInput from "../ChatInput";
 
-import ChatMessageList from "./ChatMessegeList";
+import ChatMessageList from "./ChatMessagesList";
 
 // The main task is to minimize number of rerenders of the ChatMessage
 
