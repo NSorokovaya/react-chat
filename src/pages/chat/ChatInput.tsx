@@ -109,11 +109,12 @@ export default ChatInput;
 // 6. fix image sending(nanoseconds) --done
 // 7. fix id duplicates --done
 
+// -. add upload file loading state (show progress bar on uploading)
+
 // -. show other users
 // -. add audio messages
 // -. add links preview (functions)
 // -. add presense (realtime database)
-// -. add upload file loading state
 // -. add upload file error state
 // -. add send message optimistic response
 // -. add messages list virtualization

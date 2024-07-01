@@ -4,7 +4,7 @@ import {
   selectChatId,
   selectMessagesList,
 } from "../../../redux/messaging/selectors";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   loadMoreMessages,
   subscribeToMessagesList,
@@ -82,7 +82,6 @@ export default function ChatMessageList() {
                       : "justify-start"
                   }`}
                 >
-                  {message.id}
                   <MemoizedChatMessage message={message} chatId={chatId} />
                 </li>
               </div>
