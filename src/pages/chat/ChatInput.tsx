@@ -54,7 +54,6 @@ const ChatInput = () => {
   };
 
   const handlePasteFile = async (clipboardData: DataTransferItemList) => {
-    console.log(clipboardData);
     const file = clipboardData[0].getAsFile();
     if (currentUser?.uid && file) {
       dispatch(
@@ -105,10 +104,10 @@ export default ChatInput;
 // 1. remove horizontal scrollbar in the messages list  -- done
 // 2. add styles to the messages separator -- done
 // 3. add sending file messages on ctrl + v --done
-// 4. update message styles -- ?? idk if done
-// 5. changed scroll with css -- load more messages isn't working
-//6. fix image sending(nanoseconds)
-// ---
+// 4. update message styles -- --done
+// 5. changed scroll with css --done
+// 6. fix image sending(nanoseconds) --done
+// 7. fix id duplicates --done
 
 // -. show other users
 // -. add audio messages
@@ -119,3 +118,5 @@ export default ChatInput;
 // -. add send message optimistic response
 // -. add messages list virtualization
 // -. add messages list add/remove animation
+// -. add scroll to bottom
+// TODO: add file size check

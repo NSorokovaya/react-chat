@@ -4,7 +4,7 @@ import {
   selectChatId,
   selectMessagesList,
 } from "../../../redux/messaging/selectors";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   loadMoreMessages,
   subscribeToMessagesList,
@@ -19,33 +19,13 @@ export default function ChatMessageList() {
   const chatId = useSelector(selectChatId);
   const currentUser = useSelector(selectCurrentUser);
   const messagesList = useSelector(selectMessagesList);
-
   const filteredMessagesList = messagesList.filter((m) => !!m.createdAt);
-
   useEffect(() => {
     if (chatId) {
       dispatch(subscribeToMessagesList({ chatId }));
     }
   }, [chatId, dispatch]);
 
-  // const messagesScrollRef = useRef<HTMLLIElement | null>(null);
-
-  // TODO: do with a CSS (flex-direction: column-reverse;)
-  // useEffect(() => {
-  //   messagesScrollRef.current?.lastElementChild?.scrollIntoView();
-  // }, [messagesList]);
-
-  // const handleScroll = () => {
-  //   console.log("handle scroll");
-  //   const container = containerRef.current;
-  //   console.log("container");
-  //   if (container) {
-  //     if (container.scrollTop === 0) {
-  //       console.log("loadmore");
-  //       dispatch(loadMoreMessages({ chatId }));
-  //     }
-  //   }
-  // };
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,7 +56,7 @@ export default function ChatMessageList() {
   return (
     <div className="flex-grow overflow-y-auto p-4  bg-white flex flex-col-reverse">
       <div className="space-y-2 ">
-        {filteredMessagesList ? (
+        {filteredMessagesList.length > 0 ? (
           filteredMessagesList.map((message, index) => {
             const showDate =
               index === 0 ||
@@ -84,9 +64,8 @@ export default function ChatMessageList() {
                 message.createdAt,
                 filteredMessagesList[index - 1].createdAt
               );
-
             return (
-              <React.Fragment key={message.id}>
+              <div key={`${message.id}`}>
                 {showDate && (
                   <div className="date-time flex items-center  ">
                     <div className=" h-[1px] bg-blue-100 w-full"></div>
@@ -97,17 +76,16 @@ export default function ChatMessageList() {
                   </div>
                 )}
                 <li
-                  // ref={messagesScrollRef}
-                  key={message.id}
                   className={`flex relative ${
                     message.creator === currentUser?.uid
                       ? "justify-end"
                       : "justify-start"
                   }`}
                 >
+                  {message.id}
                   <MemoizedChatMessage message={message} chatId={chatId} />
                 </li>
-              </React.Fragment>
+              </div>
             );
           })
         ) : (

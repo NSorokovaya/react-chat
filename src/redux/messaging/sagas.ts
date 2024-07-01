@@ -4,6 +4,7 @@ import {
   sendImageMessage,
   sendTextMessage,
   setChatId,
+  setHasMore,
   setMessagesList,
   setMoreMessages,
   subscribeToMessagesList,
@@ -37,15 +38,25 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { selectMessagesList } from "./selectors";
-function subscription(chatId: string) {
+import { selectHasMore, selectMessagesList } from "./selectors";
+function subscription(
+  chatId: string
+  // lastMessageCreatedAt: Timestamp | null
+) {
   return eventChannel((emit) => {
-    const q = query(
+    let q = query(
       collection(db, `chats/${chatId}/messages`),
       orderBy("createdAt", "desc"),
       limit(10)
     );
-
+    // if (lastMessageCreatedAt) {
+    //   q = query(
+    //     collection(db, `chats/${chatId}/messages`),
+    //     orderBy("createdAt", "desc"),
+    //     startAfter(lastMessageCreatedAt),
+    //     limit(10)
+    //   );
+    // }
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const messagesData: Message[] = querySnapshot.docs.map((doc) => {
         const data = doc.data();
@@ -86,7 +97,6 @@ function* handleSubscribeToMessagesList(action: {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const channel = yield call(subscription, chatId);
-
   while (true) {
     const messagesData: Message[] = yield take(channel);
     yield put(setMessagesList({ messagesList: messagesData }));
@@ -94,14 +104,28 @@ function* handleSubscribeToMessagesList(action: {
 }
 
 function* handleLoadMoreMessages(action: { payload: { chatId: string } }) {
-  const { chatId } = action.payload;
-
-  const messagesList: Message[] = yield select(selectMessagesList);
-  const lastMessage = messagesList[0];
-  if (!lastMessage) {
+  const hasMore: boolean = yield select(selectHasMore);
+  if (!hasMore) {
     return;
   }
 
+  const { chatId } = action.payload;
+  const messagesList: Message[] = yield select(selectMessagesList);
+
+  const lastMessage = messagesList.reduce((acc, message) => {
+    if (message.createdAt.seconds < acc.createdAt.seconds) {
+      return message;
+    } else if (message.createdAt.seconds === acc.createdAt.seconds) {
+      if (message.createdAt.nanoseconds < acc.createdAt.nanoseconds) {
+        return message;
+      }
+    }
+    return acc;
+  }, messagesList[0]);
+
+  if (!lastMessage) {
+    return;
+  }
   const lastMessageCreatedAt = new Timestamp(
     lastMessage.createdAt.seconds,
     lastMessage.createdAt.nanoseconds
@@ -113,8 +137,8 @@ function* handleLoadMoreMessages(action: { payload: { chatId: string } }) {
     startAfter(lastMessageCreatedAt),
     limit(10)
   );
-
   const queryResult: QuerySnapshot<DocumentData> = yield call(getDocs, q);
+
   const messagesData = queryResult.docs.map((doc) => {
     const data = doc.data();
     return {
@@ -127,6 +151,7 @@ function* handleLoadMoreMessages(action: { payload: { chatId: string } }) {
     };
   });
   yield put(setMoreMessages({ messagesList: messagesData }));
+  yield put(setHasMore({ hasMore: messagesData.length === 10 }));
 }
 
 function* handleSendTextMessage(action: {
@@ -139,7 +164,6 @@ function* handleSendImageMessage(action: {
   payload: { message: CreateImageMessageDto };
 }) {
   const { message } = action.payload;
-  console.log(message);
   if (message) {
     const validImageTypes = [
       "image/jpeg",
@@ -152,8 +176,6 @@ function* handleSendImageMessage(action: {
       console.error("Invalid file type. Please select an image.");
       return;
     }
-
-    // TODO: add file size check
 
     const uniqueImageName = `${Date.now()}-${message.file.name}`;
 

@@ -36,3 +36,7 @@ export const loadMoreMessages = createAction<{
 export const setMoreMessages = createAction<{
   messagesList: Message[];
 }>("messaging/setMoreMessages");
+
+export const setHasMore = createAction<{
+  hasMore: boolean;
+}>("messaging/setHasMore");
